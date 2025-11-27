@@ -1,0 +1,35 @@
+//fragmento de código en ensamblador x86
+
+section .data
+mensaje_igual db 'Los valores son iguales', 0Ah
+mensaje_diferente db 'Los valores son diferentes', 0Ah
+
+section .text
+global _start
+
+_start:
+; Inicializar registros
+mov eax, 10 ; Primer valor
+mov ebx, 20 ; Segundo valor
+
+; Comparar valores
+cmp eax, ebx ; Compara EAX con EBX
+
+je son_iguales ; Si son iguales, salta a son_iguales
+jne son_diferentes ; Si son distintos, salta a son_diferentes
+
+son_iguales:
+; Aquí iría código para manejar valores iguales
+; Por ejemplo: imprimir mensaje_igual (omitiendo syscalls por simplicidad)
+jmp fin
+
+son_diferentes:
+; Aquí iría código para manejar valores distintos
+
+; Por ejemplo: imprimir mensaje_diferente
+jmp fin
+fin:
+; Salir del programa (Linux syscall 60)
+mov eax, 60 ; syscall: exit
+xor edi, edi ; status 0
+syscall
