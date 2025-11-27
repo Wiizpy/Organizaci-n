@@ -1,0 +1,38 @@
+// código del inciso g. (me imagino que se referia a que imprimia la letra g, no habia un inciso g como tal)
+
+section .data
+char db 0
+newline db 10
+
+section .text
+global _start
+
+_start:
+
+mov al, 206 ;AL = 1100 1100 (antes de la rotación
+shl al, 0 ; no cambia
+shr al, 0 ; no cambia
+rol al, 0 ; no cambia
+ror al, 1 ; Rotar a la derecha (ROR) 0110 0110
+
+; Guardar en char
+mov [char], al
+
+; Escribir carácter en consola
+mov eax, 4 ; syscall write
+mov ebx, 1 ; stdout
+mov ecx, char
+mov edx, 1 ; 1 byte
+int 0x80
+
+; Salto de línea
+mov eax, 4
+mov ebx, 1
+mov ecx, newline
+mov edx, 1
+int 0x80
+
+; Salir
+mov eax, 1 ; syscall exit
+xor ebx, ebx ; código de salida 0
+int 0x80
