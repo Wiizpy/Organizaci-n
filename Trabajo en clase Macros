@@ -1,0 +1,59 @@
+1. Arreglo en memoria
+
+En la sección .data se declara:
+array dd 1, 2, 3, 4, 5
+• Es un arreglo de 5 enteros, almacenados de forma contigua.
+• Cada elemento ocupa 4 bytes (dd = double word).
+• Esto permite acceder a cada elemento calculando desplazamientos.
+
+2. Referencias y direccionamiento indexado
+
+En el bucle se utiliza:
+mov ebx, [array + ecx*4]
+• array es la dirección base del arreglo.
+• ecx actúa como índice.
+• ecx*4 calcula la posición del elemento porque cada valor mide 4 bytes.
+
+3. Acumulación con registros
+
+add eax, ebx
+• eax se usa como acumulador de la suma.
+• ebx almacena temporalmente cada valor del arreglo.
+
+4. Estructura de control tipo “for”
+
+El ciclo está hecho con:
+inc ecx
+cmp ecx, 5
+jl bucle
+Esto emula un for:
+• Inicio: ecx = 0
+• Condición: ecx < 5
+• Incremento: inc ecx
+
+5. Uso de una macro
+
+print_int eax
+La macro:
+%macro print_int 1
+mov eax, 4
+mov ebx, 1
+mov ecx, %1
+mov edx, 4
+int 0x80
+%endmacro
+• Evita repetir el código de impresión.
+• %1 es un parámetro de la macro que se sustituye en ensamblado.
+• Se expande en tiempo de ensamblaje, no en ejecución.
+
+6. Resultado del programa
+
+El programa:
+1. Recorre el arreglo
+2. Suma los 5 valores
+3. Guarda el resultado final en eax
+4. Imprime el total usando la macro
+5. Termina el programa con:
+mov eax, 1
+xor ebx, ebx
+int 0x80
