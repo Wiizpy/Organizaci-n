@@ -1,0 +1,96 @@
+////e. Modifica el programa para que imprima lo siguiente: A,
+section .data
+num1 db 5
+num2 db 11
+result db 0
+msg db 'Resultado: ', 0
+
+section .bss
+buffer resb 4
+
+section .text
+
+global _start
+
+_start:
+
+mov al, [num1]
+add al, [num2]
+mov [result], al
+; Convertir el resultado a ASCII
+movzx eax, byte [result]
+add eax, 49 ; Convertir el valor numérico en su correspondiente ASCII ('0' = 48)
+mov [buffer], al ; Almacenar el carácter ASCII en el buffer
+
+mov eax, 4
+mov ebx, 1
+mov ecx, msg
+mov edx, 11
+int 0x80
+
+mov eax, 4
+mov ebx, 1
+mov ecx, buffer
+mov edx, 1
+int 0x80
+
+mov eax, 1
+xor ebx, ebx
+int 0x80
+
+/inciso g codigo indirecto
+
+section .data
+caracter db '@'         ; Carácter almacenado en memoria
+
+section .bss
+buffer resb 1           ; Espacio para almacenar un solo byte
+
+section .text
+global _start
+
+_start:
+
+    mov esi, caracter    ; ESI recibe la dirección de 'caracter'
+    mov al, [esi]        ; Acceso indirecto: AL recibe el valor en esa dirección
+
+    mov [buffer], al     ; Copiamos el carácter al buffer para imprimirlo
+
+    ; --- Llamada al sistema para imprimir ---
+    mov eax, 4           ; sys_write
+    mov ebx, 1           ; salida estándar
+    mov ecx, buffer      ; dirección del byte a imprimir
+    mov edx, 1           ; tamaño (1 byte)
+    int 0x80
+
+    ; --- Terminar programa ---
+    mov eax, 1           ; sys_exit
+    xor ebx, ebx
+    int 0x80
+
+
+// segundo modo de direccionamiento inmediato
+section .data
+
+section .bss
+buffer resb 1          ; Espacio para almacenar un byte
+
+section .text
+global _start
+
+_start:
+
+    mov al, '@'         ; Valor inmediato: el carácter literal '@'
+    mov [buffer], al    ; Lo movemos al buffer para imprimirlo
+
+    ; --- Imprimir '@' ---
+    mov eax, 4          ; sys_write
+    mov ebx, 1          ; stdout
+    mov ecx, buffer     ; dirección del carácter
+    mov edx, 1          ; tamaño
+    int 0x80
+
+    ; --- Salir ---
+    mov eax, 1          ; sys_exit
+    xor ebx, ebx
+    int 0x80
