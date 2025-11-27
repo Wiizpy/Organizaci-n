@@ -1,0 +1,59 @@
+//código en ensamblador x86 una estructura
+similar a x/x/x, para que pueda realizar una operación
+con cada uno de los elementos de X
+
+%macro print 2
+mov eax, 4
+mov ebx, 1
+mov ecx, %1
+mov edx, %2
+int 0x80
+%endmacro
+
+section .data
+estructura dd 5, 10, 20
+
+section .bss
+resultado resd 1
+buffer resb 4        ; para convertir número → texto
+
+section .text
+global _start
+
+_start:
+    mov eax, 0
+    mov ecx, 0
+
+bucle:
+    mov ebx, [estructura + ecx*4]
+    add eax, ebx
+    inc ecx
+    cmp ecx, 3
+    jl bucle
+
+    mov [resultado], eax    ; eax = 35
+
+    ; Convertir número a ASCII
+
+    mov eax, [resultado]    ; eax = 35
+
+    mov ebx, 10
+    xor edx, edx
+    div ebx                 ; eax = 3, edx = 5
+
+    ; Guardar dígitos en ASCII
+    add eax, '0'
+    add edx, '0'
+
+    mov [buffer],    eax
+    mov [buffer+1],  edx
+    mov byte [buffer+2], 10 ; salto de línea
+    mov byte [buffer+3], 0
+
+    ; imprimir 3 caracteres
+    print buffer, 3
+
+    ; salir
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
