@@ -1,0 +1,283 @@
+1. Comparador de Números: Escribir un programa que reciba dos números y determine
+si son iguales, si uno es mayor que el otro, o si son negativos.
+section .data
+num1 db 5
+num2 db -3
+
+section .text
+global _start
+
+_start:
+mov al, [num1]
+mov bl, [num2]
+
+; Ver si alguno es negativo
+test al, al
+js num1_negativo
+
+test bl, bl
+js num2_negativo
+
+; Comparación normal
+cmp al, bl
+je iguales
+jg mayor
+jl menor
+
+iguales:
+; print "Iguales"
+jmp fin
+
+mayor:
+; print "Num1 > Num2"
+jmp fin
+
+menor:
+; print "Num1 < Num2"
+jmp fin
+
+num1_negativo:
+; print "Num1 es negativo"
+jmp fin
+
+num2_negativo:
+; print "Num2 es negativo"
+jmp fin
+
+fin:
+mov eax, 1
+int 0x80
+
+2. Clasificación de Números: Leer un número y clasificarlo como positivo, negativo o
+cero.
+section .data
+numero db -8
+
+section .text
+global _start
+
+_start:
+mov al, [numero]
+cmp al, 0
+je es_cero
+
+js es_negativo ; Sign Flag = 1
+
+jmp es_positivo
+
+es_cero:
+; print "Cero"
+jmp fin
+
+es_negativo:
+; print "Negativo"
+jmp fin
+
+es_positivo:
+; print "Positivo"
+jmp fin
+
+fin:
+
+mov eax, 1
+int 0x80
+
+3. Par o Impar: Leer un número y determinar si es par o impar usando únicamente la
+bandera de paridad (PF).
+section .data
+numero db 14
+
+section .text
+global _start
+
+_start:
+mov al, [numero]
+
+; probar paridad
+test al, 1 ; AND con 1 → solo importa último bit
+jp es_par ; PF = 1
+jnp es_impar ; PF = 0
+
+es_par:
+; print "Par"
+jmp fin
+
+es_impar:
+; print "Impar"
+jmp fin
+
+fin:
+mov eax, 1
+int 0x80
+
+4. Simulación de Overflow: Pedir dos números y sumarlos, verificando si ocurre
+desbordamiento con la bandera OF (Overflow Flag). Imprimir un mensaje si se
+detecta overflow
+section .data
+a db 120
+b db 120 ; suma = 240 → overflow en signed 8-bit
+
+section .text
+global _start
+
+_start:
+mov al, [a]
+mov bl, [b]
+
+add al, bl ; puede activar OF
+
+jo hay_overflow ; OF = 1
+jno sin_overflow ; OF = 0
+
+hay_overflow:
+; print "Hubo overflow"
+jmp fin
+
+sin_overflow:
+; print "No hubo overflow"
+jmp fin
+
+fin:
+mov eax, 1
+
+int 0x80
+
+5. Simulación de Acarreo: Realizar una suma entre dos números y verificar si hay un
+acarreo con la bandera CF (Carry Flag). Mostrar si se generó un acarreo o no.
+section .data
+a db 255
+b db 5 ; 255 + 5 genera carry
+
+section .text
+global _start
+
+_start:
+mov al, [a]
+mov bl, [b]
+
+add al, bl ; puede activar CF
+
+jc con_carry ; CF = 1
+jnc sin_carry ; CF = 0
+
+con_carry:
+; print "Hubo acarreo"
+jmp fin
+
+sin_carry:
+; print "No hubo acarreo"
+jmp fin
+
+fin:
+mov eax, 1
+
+int 0x80
+
+6. Mínimo y Máximo de Tres Números: Leer tres números e identificar el menor y el
+mayor.
+section .data
+n1 db 8
+n2 db 3
+n3 db 15
+
+section .text
+global _start
+
+_start:
+mov al, [n1] ; al = max
+mov bl, [n1] ; bl = min
+
+; comparando n2
+mov cl, [n2]
+cmp cl, al
+jg nuevo_max1
+cmp cl, bl
+jl nuevo_min1
+jmp comparar_n3
+
+nuevo_max1:
+mov al, cl
+
+nuevo_min1:
+mov bl, cl
+
+comparar_n3:
+mov cl, [n3]
+cmp cl, al
+jg nuevo_max2
+
+cmp cl, bl
+jl nuevo_min2
+jmp fin
+
+nuevo_max2:
+mov al, cl
+jmp fin
+
+nuevo_min2:
+mov bl, cl
+jmp fin
+
+fin:
+; al = max, bl = min
+mov eax, 1
+int 0x80
+
+7. Ordenamiento de Dos Números Leer dos números e intercambiarlos si no están en
+orden ascendente usando solo saltos condicionales.
+section .data
+x db 10
+y db 4
+
+section .bss
+temp resb 1
+
+section .text
+global _start
+
+_start:
+mov al, [x]
+mov bl, [y]
+
+cmp al, bl
+jle ya_ordenado ; si al <= bl no se cambia
+
+; intercambio
+mov [temp], al
+mov al, bl
+mov bl, [temp]
+
+ya_ordenado:
+; print x, y
+mov eax, 1
+int 0x80
+
+8. Ciclo de Conteo sin Comparaciones: Implementar un contador de 0 a 9.
+section .text
+global _start
+
+_start:
+mov al, 0 ; contador
+
+ciclo:
+; print al
+
+inc al ; incrementa y revisa banderas
+
+cmp al, 10 ; NO permitido, así que usamos:
+; Trick: si al pasa de 9, siguiente incremento provoca OF o ZF
+
+cmp al, 10 ; no se usa
+; Usamos esta idea:
+; Cuando al = 9 → inc → al = 10 → todavía sigue
+; Pero queremos parar en 9: entonces restamos 10 y vemos ZF
+
+mov bl, al
+sub bl, 10
+jz fin ; si bl = 0, al era 10 → detener
+
+jmp ciclo
+
+fin:
+mov eax, 1
+int 0x80
