@@ -1,0 +1,89 @@
+//snippet de código en ensamblador que simula el uso de un bloquede Try/Catch en ensamblador, utilizando saltos condicionales/incondicionales
+
+section .text
+global _start
+
+_start:
+
+TRY:
+    mov ax, 5
+    mov bx, 0
+
+    cmp bx, 0
+    je ERROR
+
+    div bx
+    jmp FIN
+
+ERROR:
+    mov dx, msgError
+    jmp FIN
+
+FIN:
+    mov dx, msgFin
+
+
+section .data
+msgError db "Se detectó un error durante la ejecución!", 0
+msgFin   db "Programa finalizado.", 0
+
+//programa en C que utilice las funciones setjmp y longjmp para simular el manejo de excepciones.
+
+#include <stdio.h>
+#include <setjmp.h>
+
+jmp_buf buffer;
+
+void retirar(float *saldo, float cantidad)
+{
+    if (cantidad > *saldo)
+    {
+        printf("\n[ERROR]: Fondos insuficientes\n");
+        longjmp(buffer, 1);
+    }
+
+    *saldo -= cantidad;
+    printf("Retiro exitoso. Nuevo saldo: %.2f\n", *saldo);
+}
+
+int main()
+{
+    float saldo = 1000;
+    float retiro;
+
+    if (setjmp(buffer) == 0)
+    {
+        printf("Saldo actual: %.2f\n", saldo);
+        printf("Cantidad a retirar: ");
+        scanf("%f", &retiro);
+
+        retirar(&saldo, retiro);
+    }
+    else
+    {
+        printf("Operacion cancelada. Intente con una cantidad válida.\n");
+    }
+
+    printf("\nPrograma finalizado correctamente.\n");
+    return 0;
+}
+
+//snippet de código que utilice los breakpoints en su IDE
+
+#include <stdio.h>
+
+int suma(int a, int b)
+{
+    return a + b; // Breakpoint aqui
+}
+
+int main()
+{
+    int x = 10;
+    int y = 20;
+
+    int resultado = suma(x, y);
+    printf("Resultado: %d\n", resultado);
+
+    return 0;
+}
